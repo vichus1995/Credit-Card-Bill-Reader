@@ -1,0 +1,10 @@
+.venv
+venv/
+CreditCardBillExtracter/credentials.py
+.idea
+data/
+
+client_secret.json
+gmail_token.json
+
+*.log
