@@ -6,6 +6,9 @@ from simplegmail import Gmail
 from simplegmail.query import construct_query
 from CreditCardBillExtracter import config as cf, credentials as cr
 import utils as ut
+import logging_config
+
+logger = logging.getLogger(__name__)
 
 
 def download_attachments(gmail: Gmail, sender: list[str]) -> int:
@@ -31,10 +34,10 @@ def download_attachments(gmail: Gmail, sender: list[str]) -> int:
         messages = gmail.get_messages(query=construct_query(query_params))
     except PermissionError as e:
         err_message = f"Not enough permissions to perform read from Gmail account: {e}"
-        logging.error(err_message)
+        logger.error(err_message)
         raise e(err_message)
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
         raise
 
     file_list = []
@@ -43,17 +46,22 @@ def download_attachments(gmail: Gmail, sender: list[str]) -> int:
         if message.attachments:
 
             for attachment in message.attachments:
+
                 out_file_name = attachment.filename.replace('/', '')
-                filepath = cf.input_data_sub_folder + out_file_name
+                if out_file_name.split(".")[-1].lower() == 'pdf':
 
-                try:
-                    attachment.save(filepath=filepath, overwrite=True)
-                except PermissionError as err:
-                    err_message = f"You don't have required permissions to save {filepath} file to the specified folder"
-                    logging.error(err_message)
-                    raise err(err_message)
+                    try:
+                        filepath = cf.input_data_sub_folder + out_file_name
+                        attachment.save(filepath=filepath, overwrite=True)
+                    except PermissionError as err:
+                        err_message = f"You don't have required permissions to save {filepath} file to the specified folder"
+                        logger.error(err_message)
+                        raise err(err_message)
 
-                file_list.append((message.sender.split("<")[1].split(">")[0], filepath))
-            is_new_files_downloaded = True
+                    file_list.append((message.sender.split("<")[1].split(">")[0], filepath))
+                    logger.info(f"{out_file_name} downloaded successfully")
+
+    if file_list:
+        is_new_files_downloaded = True
 
     return is_new_files_downloaded, file_list
