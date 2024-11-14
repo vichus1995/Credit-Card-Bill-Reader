@@ -10,7 +10,7 @@ logging.basicConfig(
     format=log_format,
     handlers=[
         logging.FileHandler("debug.log"),
-        logging.StreamHandler()
+#        logging.StreamHandler()
     ]
 )
 
