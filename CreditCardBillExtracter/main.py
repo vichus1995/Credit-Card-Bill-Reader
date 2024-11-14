@@ -1,4 +1,5 @@
 import datetime
+import sys
 
 from CreditCardBillExtracter import config as cf
 import utils as ut
@@ -17,16 +18,29 @@ logger = logging.getLogger(__name__)
 def main():
 
     """ Create data, data/input, and data/output folders if they do not exist"""
-    ut.create_dir_if_not_exists(cf.data_root_folder)
-    ut.create_dir_if_not_exists(cf.input_data_sub_folder)
-    ut.create_dir_if_not_exists(cf.output_data_sub_folder)
+    try:
+        ut.create_dir_if_not_exists(cf.data_root_folder)
+        ut.create_dir_if_not_exists(cf.input_data_sub_folder)
+        ut.create_dir_if_not_exists(cf.output_data_sub_folder)
+
+    except PermissionError as err:
+        raise err(err.args[0])
+        sys.exit(1)
 
     """Stored the run start time in UTC time to update the watermark table in the database"""
     current_utc_time = datetime.now(timezone.utc)
 
     """Connects to Gmail and downloads attachments for the new mails since the last run"""
     gmail = Gmail()
-    download_status = download_attachments(gmail=gmail, sender=[sender["sender_email"] for sender in cf.credit_card_sender_config])
+
+    try:
+        download_status = download_attachments(gmail=gmail, sender=[sender["sender_email"] for sender in cf.credit_card_sender_config])
+    except ConnectionError as err:
+        raise(err.args[0])
+        sys.exit(1)
+    except PermissionError as err:
+        raise(err.args[0])
+        sys.exit(1)
 
     """Checks if any new PDF file has been downloaded. 
     If new files are there, proceed"""

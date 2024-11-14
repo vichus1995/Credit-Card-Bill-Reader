@@ -11,9 +11,10 @@ def create_dir_if_not_exists(directory):
     try:
         if not os.path.exists(directory):
             os.makedirs(directory)
-    except PermissionError:
-        logger.error("You do not have the required permission to the folder")
-        raise
+    except PermissionError as err:
+        err_message = f"You do not have the required permission to the folder : {directory}"
+        logger.error(err_message)
+        raise err(err_message)
     except Exception as e:
         logger.error(e)
         raise
@@ -37,9 +38,10 @@ def create_sql_db_connection(server, database, user, password):
                                     UID=user,
                                     PWD=password)
 
-    except Exception as e:
-        logger.critical("Failed to connect to database: %s", e, exc_info=True)
-        raise e
+    except pyodbc.Error as e:
+        err_message = f"Failed to connect to database with error: SQL STATE: {e.args[0]}, Error: {e.args[1]}"
+        logger.critical(err_message, exc_info=True)
+        raise ConnectionError(err_message)
 
     return connection
 
