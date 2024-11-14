@@ -9,11 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 def read_pdf(pdf_file_list: list[str], convert_to_numeric: bool):
-    print(pdf_file_list)
+
     pdf_text_extract = []
     span_text = None
     for sender, pdf_file in pdf_file_list:
-        print(pdf_file)
+
         if pdf_file.split(".")[-1].lower() != 'pdf':
             continue
 
@@ -25,7 +25,9 @@ def read_pdf(pdf_file_list: list[str], convert_to_numeric: bool):
 
             page_content = reader.pages[0].extract_text().split("\n")
         except PdfReadError as e:
-            logger.error(f"Unable to read PDF file: {e}")
+            err_message = f"Unable to read PDF file: {e}"
+            logger.error(err_message)
+            raise(err_message)
         except Exception as e:
             logger.error(e)
 
@@ -62,6 +64,8 @@ def read_pdf(pdf_file_list: list[str], convert_to_numeric: bool):
                 pdf_text_extract.append((bank_name, card_last_4_digits, bill_date.strftime("%Y-%m-%d"), span_text_value))
             else:
                 pdf_text_extract.append(span_text)
+
+            logger.info(f"{pdf_file} for {bank_name} card ending {card_last_4_digits} read successfully")
 
         except AttributeError as e:
             logger.error(f"No matching text found in {pdf_file}")

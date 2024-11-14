@@ -1,9 +1,9 @@
 import credentials as cr
 
 #root folder for storing the data
-data_root_folder = './data'
-input_data_sub_folder = './data/input_data/'
-output_data_sub_folder = './data/output_data/'
+data_root_folder = '../data'
+input_data_sub_folder = '../data/input_data/'
+output_data_sub_folder = '../data/output_data/'
 
 
 credit_card_sender_config =\
