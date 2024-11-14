@@ -4,7 +4,7 @@ CreditCardBillExtracter/credentials.py
 .idea
 data/
 
-client_secret.json
-gmail_token.json
+CreditCardBillExtracter/client_secret.json
+CreditCardBillExtracter/gmail_token.json
 
 *.log
