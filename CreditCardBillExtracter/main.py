@@ -1,6 +1,8 @@
 import datetime
 import sys
 
+import pyodbc
+
 from CreditCardBillExtracter import config as cf
 import utils as ut
 from simplegmail import Gmail
@@ -10,6 +12,7 @@ from sql_crud import update_or_insert_credit_card_table, update_watermark
 from datetime import datetime, timezone
 import logging_config
 import logging
+from pypdf.errors import PdfReadError
 
 
 logger = logging.getLogger(__name__)
@@ -42,26 +45,33 @@ def main():
         raise(err.args[0])
         sys.exit(1)
 
-    """Checks if any new PDF file has been downloaded. 
-    If new files are there, proceed"""
-    if download_status[0]:
-        """ extract the required part of the newly downloaded PDFs and return it as a list of dicts"""
-        pdf_extract_text =\
-            read_pdf([(sender, pdf_file_location) for (sender, pdf_file_location) in download_status[1]]\
-                        , convert_to_numeric=True)
+    try:
+        """Checks if any new PDF file has been downloaded. 
+        If new files are there, proceed"""
+        if download_status[0]:
+            """ extract the required part of the newly downloaded PDFs and return it as a list of dicts"""
 
-        """convert the list of dicts to a list of tuples"""
-        pdf_extract_text = [(f["bank_name"], f["card_last_4_digits"], f["bill_date"], f["bill_amount"])\
-                            for f in pdf_extract_text]
+            pdf_extract_text =\
+                read_pdf([(sender, pdf_file_location) for (sender, pdf_file_location) in download_status[1]]\
+                            , convert_to_numeric=True)
 
-        """Update or insert the data into the SQL database table based on keys"""
-        update_or_insert_credit_card_table(pdf_extract=pdf_extract_text)
+            """convert the list of dicts to a list of tuples"""
+            pdf_extract_text = [(f["bank_name"], f["card_last_4_digits"], f["bill_date"], f["bill_amount"])\
+                                for f in pdf_extract_text]
 
-    else:
-        logging.info("No new bills found")
+            """Update or insert the data into the SQL database table based on keys"""
+            update_or_insert_credit_card_table(pdf_extract=pdf_extract_text)
 
-    """Updates the SQL watermark table with current run start time"""
-    update_watermark(current_utc_time=current_utc_time)
+        else:
+            logging.info("No new bills found")
+
+        """Updates the SQL watermark table with current run start time"""
+        update_watermark(current_utc_time=current_utc_time)
+    except (PdfReadError, ValueError, AttributeError, pyodbc.ProgrammingError, pyodbc.Error) as err:
+        raise err[err.args[0]]
+        sys.exit(1)
+    except Exception as err:
+        raise
 
 
 
