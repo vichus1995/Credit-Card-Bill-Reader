@@ -62,6 +62,17 @@ def main():
             """Update or insert the data into the SQL database table based on keys"""
             update_or_insert_credit_card_table(pdf_extract=pdf_extract_text)
 
+            last_30_day_bills = ut.read_from_sql(connection=cf.connection, sql_query=cf.sql_get_historic_data.
+                                                 format(sql_final_table_name=cf.sql_final_table_name),
+                                                 add_header_row=True, args=30)
+            if last_30_day_bills:
+                export_file_path = cf.output_data_sub_folder +\
+                                   "credit_card_last_30_days_" + \
+                                   current_utc_time.strftime("%Y-%m-%d_%H%M%S%f") + ".csv"
+                ut.write_to_csv(records=last_30_day_bills, filename=export_file_path)
+
+                ut.send_email(gmail=gmail, file_path=export_file_path, subject="Credit card bill for last 30 days")
+
         else:
             logging.info("No new bills found")
 
@@ -72,6 +83,9 @@ def main():
         sys.exit(1)
     except Exception as err:
         raise
+    finally:
+        if cf.connection:
+            ut.close_sql_db_connection(connection=cf.connection)
 
 
 
