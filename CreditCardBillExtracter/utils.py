@@ -129,6 +129,14 @@ def write_to_csv(records, filename):
         writer = csv.writer(f)
         writer.writerows(records)
 
+def send_email(gmail, file_path, subject):
+
+    send_file_params = cf.send_config
+    send_file_params["subject"] = subject
+    send_file_params["attachments"] = file_path
+    message = gmail.send_message(**send_file_params)
+
+
 
 
 
