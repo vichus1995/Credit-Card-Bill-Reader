@@ -1,4 +1,5 @@
 import credentials as cr
+import utils as ut
 
 #root folder for storing the data
 data_root_folder = '../data'
@@ -56,8 +57,11 @@ sql_update_watermark_table = f'''UPDATE {watermark_table_name} SET LastUpdatedTi
 sql_get_watermark_timestamp = f'''SELECT LastUpdatedTimestamp FROM {watermark_table_name} WHERE OperationName = ?'''
 
 sql_get_historic_data = '''SELECT BankName, CardLast4Digits, BillDate, TotalAmountDue FROM {sql_final_table_name}\
-                        WHERE BillDate > GETUTCDATE() - {days_before}'''\
-                        .format(sql_final_table_name=sql_final_table_name)
+                        WHERE BillDate > GETUTCDATE() - ?'''
+
+connection = ut.create_sql_db_connection(server=cr.sql_server_name, database=cr.sql_db_name,
+                                         user=cr.sql_user_name, password=cr.sql_password)
+
 
 
 

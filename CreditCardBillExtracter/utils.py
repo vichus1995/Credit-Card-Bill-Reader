@@ -89,6 +89,7 @@ def run_sql_query(connection, sql_query: str):
 
 
 def read_from_sql(connection, sql_query: str, args=None, add_header_row=False):
+
     cursor = connection.cursor()
     try:
         return_list = cursor.execute(sql_query, args).fetchall()
@@ -120,6 +121,7 @@ def update_sql_query(connection, sql_query: str, args=None):
         raise
     connection.commit()
     cursor.close()
+
 
 def write_to_csv(records, filename):
 
