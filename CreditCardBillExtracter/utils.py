@@ -1,3 +1,4 @@
+import csv
 import os
 from CreditCardBillExtracter import config as cf
 import pyodbc
@@ -120,6 +121,11 @@ def update_sql_query(connection, sql_query: str, args=None):
     connection.commit()
     cursor.close()
 
+def write_to_csv(records, filename):
+
+    with open(filename, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(records)
 
 
 
