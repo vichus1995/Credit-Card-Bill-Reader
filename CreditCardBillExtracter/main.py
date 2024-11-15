@@ -71,6 +71,8 @@ def main():
                                    current_utc_time.strftime("%Y-%m-%d_%H%M%S%f") + ".csv"
                 ut.write_to_csv(records=last_30_day_bills, filename=export_file_path)
 
+                ut.send_email(gmail=gmail, file_path=export_file_path, subject="Credit card bill for last 30 days")
+
         else:
             logging.info("No new bills found")
 
