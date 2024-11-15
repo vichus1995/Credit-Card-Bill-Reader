@@ -40,6 +40,7 @@ credit_card_sender_config =\
 #SQL queries
 
 sql_staging_table_name = '''dbo.Staging_CreditCardInfo'''
+sql_final_table_name = '''dbo.CreditCardInfo'''
 watermark_table_name = '''dbo.Operation_Watermark'''
 sql_staging_to_final_table_sp_name = '''dbo.usp_Update_CreditCardInfo_from_Staging'''
 cred_card_watermark_table_operation_name = '''CreditCardReader'''
@@ -53,6 +54,10 @@ sql_exec_staging_to_final_table_sp = '''EXEC {sp_name}'''.format(sp_name=sql_sta
 
 sql_update_watermark_table = f'''UPDATE {watermark_table_name} SET LastUpdatedTimestamp = ? WHERE OperationName = ?'''
 sql_get_watermark_timestamp = f'''SELECT LastUpdatedTimestamp FROM {watermark_table_name} WHERE OperationName = ?'''
+
+sql_get_historic_data = '''SELECT BankName, CardLast4Digits, BillDate, TotalAmountDue FROM {sql_final_table_name}\
+                        WHERE BillDate > GETUTCDATE() - {days_before}'''\
+                        .format(sql_final_table_name=sql_final_table_name)
 
 
 
