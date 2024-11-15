@@ -39,10 +39,9 @@ credit_card_sender_config =\
     ]
 
 
-report_send_config = {
+send_config = {
     "to": cr.file_receiver_email,
-    "sender": cr.application_email,
-    "subject": "Credit card bill for last 30 days"
+    "sender": cr.application_email
 }
 #SQL queries
 
