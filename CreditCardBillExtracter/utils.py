@@ -86,7 +86,8 @@ def run_sql_query(connection, sql_query: str):
     connection.commit()
     cursor.close()
 
-def read_from_sql(connection, sql_query: str, args=None):
+
+def read_from_sql(connection, sql_query: str, args=None, add_header_row=False):
     cursor = connection.cursor()
     try:
         return_list = cursor.execute(sql_query, args).fetchall()
@@ -96,6 +97,9 @@ def read_from_sql(connection, sql_query: str, args=None):
     except pyodbc.Error as e:
         logger.error(f"Error:{e}")
         raise
+    if add_header_row:
+        columns = [column[0] for column in cursor.description]
+        return_list.insert(0, columns)
 
     connection.commit()
     cursor.close()
