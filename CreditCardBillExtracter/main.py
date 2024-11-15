@@ -67,7 +67,7 @@ def main():
                                                  add_header_row=True, args=30)
             if last_30_day_bills:
                 export_file_path = cf.output_data_sub_folder +\
-                                   "/credit_card_last_30_days_" + \
+                                   "credit_card_last_30_days_" + \
                                    current_utc_time.strftime("%Y-%m-%d_%H%M%S%f") + ".csv"
                 ut.write_to_csv(records=last_30_day_bills, filename=export_file_path)
 
@@ -83,6 +83,9 @@ def main():
         sys.exit(1)
     except Exception as err:
         raise
+    finally:
+        if cf.connection:
+            ut.close_sql_db_connection(connection=cf.connection)
 
 
 
