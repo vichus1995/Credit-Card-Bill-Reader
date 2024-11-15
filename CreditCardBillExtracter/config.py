@@ -38,6 +38,12 @@ credit_card_sender_config =\
         }
     ]
 
+
+report_send_config = {
+    "to": cr.file_receiver_email,
+    "sender": cr.application_email,
+    "subject": "Credit card bill for last 30 days"
+}
 #SQL queries
 
 sql_staging_table_name = '''dbo.Staging_CreditCardInfo'''
